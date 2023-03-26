@@ -1,0 +1,152 @@
+import React, { useState } from 'react'
+import "./create.css"
+import Navbar from "../Navbar/Navbar"
+import { Box, TextField, Button, Tooltip } from '@mui/material'
+import { ToastContainer, toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios'
+
+
+const Create = () => {
+    
+
+    const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
+    const [age, setAge] = useState("")
+    const [key, setKey] = useState("")
+    
+
+    const Submit = async () => {
+        try {
+            if(name === "" || email === "" || age === "" || key === ""){
+                toast.warn('Fill Data first!', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    });
+                    return false
+            }
+            await axios.post("http://localhost:8000/add", {
+                name, email, age, key
+            }).then((res) => {
+                if (res.data.mess === "Data exist") {
+                    toast.error('Data already exist!', {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        });
+                } else if (res.data.mess === "Key is used"){
+                    toast.error('Key exist!', {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        });
+                }
+                else {
+                    toast.success('Data is Stored', {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        });
+                        setName("")
+                        setAge("")
+                        setEmail("")
+                        setKey("")
+                        
+                }
+            }).catch(() => {
+                toast.error('Invalid Data!', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    });
+            })
+        } catch (e) {
+            toast.error('Server Problem!', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                });
+        }
+    }
+
+    return (
+        <>
+            <Navbar />
+            <div className="main-container">
+                <div className="main-div">
+                    <div className="top">
+                        <h1>Add Data</h1>
+                    </div>
+                    <div className="bottom">
+                        <Box
+                            component="form"
+                            sx={{
+                                '& > :not(style)': { m: -2, width: '100ch' },
+                            }}
+                            noValidate
+                            autoComplete="off"
+                        >
+                            <div className="bottom">
+                                <TextField value={name} onChange={(e) => setName(e.target.value)} className='text' id="outlined-basic" label="Name" variant="outlined" />
+                                <TextField value={email} onChange={(e) => setEmail(e.target.value)} className='text' id="filled-basic" label="Email" variant="outlined" />
+                                <TextField value={age} onChange={(e) => setAge(e.target.value)} className='text' id="standard-basic" label="Age" variant="outlined" />
+                                <TextField value={key} onChange={(e) => setKey(e.target.value)} className='text' id="standard-basic" label="Secret Key" variant="outlined" />
+                            </div>
+                        </Box>
+                        <Tooltip title="Add" arrow>
+                            <Button 
+                            className='button1' 
+                            variant="contained"
+                            onClick={Submit}>Add Data</Button>
+                        </Tooltip>
+                    </div>
+                </div>
+                <ToastContainer
+                    position="top-right"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="colored"
+                />
+            </div>
+        </>
+    )
+}
+
+export default Create
